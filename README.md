@@ -39,7 +39,7 @@ Tests: from backend, run pytest -q.
 ## Data and privacy
 The app does not ask for identifying information. A random session UUID associates decisions. The backend stores scenario IDs, actions, optional selected option IDs, answer-key correctness, and timestamps. Participants can delete their session in the UI. A deployed server operator controls the database and backups; do not use this prototype for sensitive or identifiable participant data without appropriate ethics, security, retention, and consent review.
 
-Local SQLite defaults to backend/reliancelab.sqlite3. Set RELIANCELAB_DB_PATH to change it. In deployment, use a persistent disk or managed database; ephemeral container filesystems can lose SQLite data on restart or redeploy.
+Local SQLite defaults to backend/reliancelab.sqlite3. Set RELIANCELAB_DB_PATH to change it. The current free Render deployment stores SQLite at /tmp/reliancelab.sqlite3 on an ephemeral filesystem: recorded sessions may be lost when the service restarts or redeploys. Treat the hosted instance as a demonstration only, not a durable research data-collection system. For real studies, configure a persistent database (and an appropriate consent, retention, security, and ethics process) before collecting participant data.
 
 ## Deployment
 Frontend: deploy the frontend directory to Vercel. Set VITE_API_URL to the deployed backend URL (without trailing slash). The included vercel.json supports SPA routing.
