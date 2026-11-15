@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: reliancelab-api
+    runtime: docker
+    rootDir: backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://YOUR-VERCEL-APP.vercel.app,http://localhost:5173
+      - key: RELIANCELAB_DB_PATH
+        value: /var/data/reliancelab.sqlite3
+    disk:
+      name: reliancelab-data
+      mountPath: /var/data
+      sizeGB: 1
