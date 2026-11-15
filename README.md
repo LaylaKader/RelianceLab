@@ -1,108 +1,83 @@
 # RelianceLab
 
-**An exploratory Human–AI Interaction platform for examining appropriate reliance on AI recommendations.**
+**An exploratory Human–AI Interaction platform for examining how people respond to AI recommendations, confidence statements, uncertainty disclosures and evidence.**
 
-RelianceLab gives participants a guided set of four fixed, scripted decision scenarios. Each scenario presents an AI recommendation, a stated confidence value, an uncertainty statement, and an evidence summary. Participants make two separate choices: (1) which answer is best supported by the evidence, and (2) whether they would accept, reject, or verify the AI recommendation.
+Live app: https://reliancelab.vercel.app/
 
-After each decision, the app reveals the scenario answer key and explains whether the recommendation was supported. At the end, it provides descriptive session analysis and a scenario-by-scenario review.
+## Product areas
 
-> **Research boundary:** This is a scripted research prototype, not a live AI model, validated trust scale, clinical or educational decision aid, or predictor of human behaviour. Confidence values and answer keys are authored scenario attributes. The report describes observed choices only.
+- **Decision Lab:** guided participant flow with four fixed scenarios, evidence judgement, separate reliance decision, immediate explanatory feedback and a session report.
+- **Session Report:** descriptive decision summaries, scenario-level analysis, CSV export and full JSON export.
+- **Researcher Workspace:** local study label, research question, researcher notes, session diagnostics and order-condition visibility.
+- **Scenario Studio:** create, preview, save and export researcher-authored scenario drafts. Drafts are stored in the current browser and do not enter the live participant study automatically.
+- **Methods & Ethics:** explains the study logic, constructs, limitations and precautions before formal research use.
 
-## What the app does
+## Study design features
 
-1. **Inspect:** Read the AI recommendation, its stated confidence, uncertainty disclosure, and available evidence.
-2. **Answer:** Select the conclusion best supported by the scenario.
-3. **Decide:** Separately accept, reject, or verify the AI recommendation.
-4. **Learn:** Receive immediate feedback explaining the answer key and whether the AI recommendation was supported.
-5. **Analyse:** Review action counts, answer-key alignment, acceptance of supported versus unsupported recommendations, and each scenario's rationale.
+The four canonical scenarios are fixed and transparent: two recommendations supported by their evidence summaries and two unsupported or overconfident recommendations. Newly created sessions alternate between standard and reverse scenario order. This is a simple counterbalancing demonstration; it is not a randomised assignment service or a complete experimental platform.
 
-## Scenario design
+The participant flow records two separate outcomes:
+1. **Evidence judgement:** whether the selected answer matches the authored scenario key.
+2. **Reliance action:** accept, reject, or verify the AI recommendation.
 
-The four scenarios are fixed and presented in a transparent order—not selected randomly. Two recommendations are designed to be supported by the evidence and two are deliberately flawed or overconfident. This creates opportunities to observe both acceptance and non-acceptance rather than rewarding rejection in every case.
+Reports distinguish acceptance of supported recommendations from acceptance of unsupported recommendations. A verification choice is not automatically better or worse than accepting or rejecting.
 
-- **Education:** A qualified recommendation about spaced practice for long-term retention.
-- **Health information:** A cautious recommendation to seek qualified advice when a text-only tool cannot assess a persistent high fever. Educational scenario only, not medical advice.
-- **Civic information:** An unsupported claim about a charity's donation transfers.
-- **Workplace reasoning:** An unjustified causal claim based on a small survey without a comparison group.
+## Research boundary
 
-The scenario keys are illustrative and should be reviewed and piloted before any formal research use.
-
-## How to interpret the analysis
-
-The report separates two things that should not be conflated:
-
-- **Answer-key alignment:** Whether the participant's selected answer matches the authored scenario key.
-- **Reliance decision:** Whether the participant accepted, rejected, or chose to verify the AI recommendation.
-
-It also distinguishes accepted supported recommendations from accepted unsupported recommendations. A verification choice is not automatically better or worse than acceptance or rejection. The categories are descriptive labels for these scenarios—not a score of a person's trust, competence, or decision quality.
+This is a scripted research prototype, not a live AI model, validated trust scale, clinical or educational decision aid, or predictor of human behaviour. Confidence values and answer keys are authored scenario attributes. The report describes observed choices only. The scenario keys should be reviewed by domain experts and piloted before formal research use.
 
 ## Technology
 
 - Frontend: React, Vite, JavaScript, responsive CSS.
 - Backend: Python, FastAPI, Pydantic.
 - Storage: SQLite.
-- API: scenario delivery, anonymous session creation, decision recording, descriptive report, and session deletion.
-- Tests: FastAPI TestClient coverage for hidden answer keys, feedback, report calculations, validation, duplicate submissions, and deletion.
+- Exports: CSV and JSON from completed sessions.
+- Tests: FastAPI TestClient for hidden answer keys, feedback, report calculations, validation, deletion and counterbalanced order.
 
 ## Run locally
 
-### Backend
-
+Backend:
 ```bash
 cd backend
 python -m venv .venv
-# Activate the virtual environment, then:
+# Activate the environment
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-API docs: http://localhost:8000/docs
-
-### Frontend
-
-In a second terminal:
-
+Frontend:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Open http://localhost:5173. The frontend defaults to http://localhost:8000. Set `VITE_API_URL` to the deployed API base URL when building for production.
+Open http://localhost:5173. The frontend defaults to http://localhost:8000; set `VITE_API_URL` for another API base URL.
 
-### Tests
-
-From the backend directory:
-
+Tests:
 ```bash
+cd backend
 pytest -q
 ```
 
 ## API
 
-- `GET /health` — health check and API version.
-- `GET /api/scenarios` — public scenario content; answer keys remain hidden.
-- `POST /api/sessions` — create an anonymous session after consent.
-- `POST /api/sessions/{id}/decisions` — record one decision per scenario and return post-decision feedback.
-- `GET /api/sessions/{id}/report` — descriptive report with per-scenario analysis.
+- `GET /health`
+- `GET /api/scenarios` — public scenario content only.
+- `POST /api/sessions` — create an anonymous session and return its order condition and scenario order.
+- `POST /api/sessions/{id}/decisions` — record one decision per scenario and return feedback.
+- `GET /api/sessions/{id}/report` — descriptive report and scenario-level analysis.
 - `DELETE /api/sessions/{id}` — delete the session and associated decisions.
 
-## Privacy and data
+## Privacy and deployment notes
 
-The app does not ask for names, emails, or account credentials. A random session UUID associates choices. The backend stores scenario IDs, actions, optional selected option IDs, answer-key correctness, and timestamps. Participants can delete their session in the UI.
+The app does not ask for names, emails or account credentials. A random session UUID associates choices. The researcher workspace notes and custom scenario drafts are stored in browser localStorage. Participant decisions are stored server-side in SQLite. The server operator controls the database and backups. The current free Render instance may use ephemeral storage; session records may be lost on restart or redeploy. Treat hosted data as demonstration data unless persistent storage, retention and access controls are explicitly configured.
 
-The server operator controls the database and backups. Do not collect sensitive or identifiable participant data without appropriate ethics review, informed consent, security, and retention procedures. The current free Render instance may use ephemeral storage; recorded sessions may be lost when the service restarts or redeploys. Treat the public hosted app as a demonstration unless persistent storage and operational safeguards have been verified.
+Do not collect identifiable or sensitive participant data without appropriate ethics review, informed consent, security and retention procedures.
 
-## Methodological limitations and next steps
+## Formal research checklist
 
-- The scenarios are scripted; no live model inference occurs.
-- Confidence values are fixed scenario attributes, not calibrated probabilities.
-- Answer keys are authored for these examples, not a validated benchmark.
-- Four scenarios are too few to support general conclusions about human trust or reliance.
-- Wording, scenario order, domain knowledge, and option design can influence responses.
-- The app does not randomise or counterbalance conditions.
-
-Before formal research use: obtain ethics approval where required, pilot and revise scenarios with domain reviewers, consider counterbalanced conditions, pre-register outcomes, test the interface with participants, and plan secure persistent data storage. Do not present demo-session results as generalisable findings.
+Before a study: obtain ethics approval where required; review scenarios with domain experts; pilot wording and answer keys; pre-register research questions and outcomes; plan recruitment, consent, debriefing, secure storage and retention; test order balancing; and avoid presenting prototype outputs as validated measurements.
 
 ## License
 
